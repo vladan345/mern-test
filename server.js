@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const auth = require("./auth");
 
 const dbConnect = require("./db/dbConnect");
 const User = require("./db/userModel");
@@ -9,6 +10,20 @@ const User = require("./db/userModel");
 dbConnect();
 
 const app = express();
+
+// Curb Cores Error by adding a header here
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  );
+  next();
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -100,6 +115,16 @@ app.post("/login", (request, response) => {
         e,
       });
     });
+});
+
+// free endpoint
+app.get("/free-endpoint", (request, response) => {
+  response.json({ message: "You are free to access me anytime" });
+});
+
+// authentication endpoint
+app.get("/auth-endpoint", auth, (request, response) => {
+  response.json({ message: "You are authorized to access me" });
 });
 
 const PORT = 5000;
